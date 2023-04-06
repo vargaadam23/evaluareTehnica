@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +26,10 @@ public class AuthService {
         var user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .currencyTokens(200)
+                .ownedQuests(new ArrayList<>())
+                .userQuests(new ArrayList<>())
+                .rank(-1)
                 .build();
 
         var savedUser = repository.save(user);

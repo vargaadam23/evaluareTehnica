@@ -27,14 +27,15 @@ public class User implements UserDetails {
     private Long id;
     private String username;
     private String password;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Token> tokens;
     @Column(name = "user_rank")
-    private Integer rank;
+    private int rank;
     @OneToMany(mappedBy = "questMaster")
     private List<Quest> ownedQuests;
     @OneToMany(mappedBy = "user")
     private List<UserQuest> userQuests;
+    private int currencyTokens;
 //    @OneToMany(mappedBy = "user")
 //    private List<Badge> badges;
 

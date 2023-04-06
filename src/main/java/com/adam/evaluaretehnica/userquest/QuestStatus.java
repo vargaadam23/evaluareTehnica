@@ -4,5 +4,6 @@ public enum QuestStatus {
     CANCELLED,
     IN_REVIEW,
     FAILED,
-    COMPLETED
+    COMPLETED,
+    NEW
 }
