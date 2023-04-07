@@ -1,1 +1,1 @@
-# accesaEvaluareTehnica
+# evaluareTehnica
