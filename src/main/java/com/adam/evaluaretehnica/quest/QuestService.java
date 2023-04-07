@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.quest;
 
+import com.adam.evaluaretehnica.quest.http.QuestCreationRequest;
 import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.user.UserService;
 import com.adam.evaluaretehnica.userquest.QuestStatus;
@@ -27,7 +28,7 @@ public class QuestService {
     private final UserQuestService userQuestService;
 
     @Transactional
-    public void createQuestWithCreationRequest(QuestCreationRequest request){
+    public void createQuestWithCreationRequest(QuestCreationRequest request) {
         //Create quest with already known properties
         Quest quest = Quest.builder()
                 .name(request.getName())
@@ -38,7 +39,9 @@ public class QuestService {
                 .isFinalised(false)
                 .questMasterReward(0)
                 .assignedUserQuests(new ArrayList<>())
-                .requiresProof(request.isRequiresProof()).build();
+                .requiresProof(request.isRequiresProof())
+                .totalTokenPrize(request.getPrize())
+                .build();
 
         UserQuest userQuest = null;
 
@@ -46,12 +49,13 @@ public class QuestService {
         List<User> userList = userService.getUsersBasedOnIdList(request.getUsers());
         User currentUser = userService.getCurrentUser();
 
+        //Remove quest master from list if present
+        userList.remove(currentUser);
+
         quest.setQuestMaster(currentUser);
-        //Set the individual quest reward to be the total reward divided by the number of users that have the quest
-        quest.setIndividualTokenPrize(userList.size() > 0 ? request.getPrize() / userList.size() : 0);
 
         //Create a UserQuest for each user
-        for (User user : userList){
+        for (User user : userList) {
             userQuest = UserQuest.builder()
                     .quest(quest)
                     .questStatus(QuestStatus.NEW)
@@ -63,10 +67,12 @@ public class QuestService {
             quest.addUserQuest(userQuest);
         }
 
+        quest.calculateIndividualTokenPrize();
+
         questRepository.save(quest);
     }
 
-    public List<Quest> getQuestMasterQuests(){
+    public List<Quest> getQuestMasterQuests() {
         return questRepository.findByQuestMasterAndIsFinalised(
                 userService.getCurrentUser(), false
         );

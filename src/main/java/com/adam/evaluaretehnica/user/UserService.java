@@ -1,7 +1,5 @@
 package com.adam.evaluaretehnica.user;
 
-import com.adam.evaluaretehnica.security.token.Token;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,11 +13,11 @@ public class UserService {
     @Autowired
     private final UserRepository userRepository;
 
-    public List<User> getUsersBasedOnIdList(List<Long> userIds){
+    public List<User> getUsersBasedOnIdList(List<Long> userIds) {
         return userRepository.findByIdIn(userIds);
     }
 
-    public User getCurrentUser(){
+    public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

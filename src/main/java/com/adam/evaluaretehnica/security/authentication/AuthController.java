@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.security.authentication;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,13 +16,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<LogInResponse> register(
-            @RequestBody RegisterRequest request
+            @RequestBody @Valid RegisterRequest request
     ) {
         return ResponseEntity.ok(service.register(request));
     }
+
     @PostMapping("/login")
     public ResponseEntity<LogInResponse> authenticate(
-            @RequestBody LogInRequest request
+            @RequestBody @Valid LogInRequest request
     ) {
         return ResponseEntity.ok(service.authenticate(request));
     }

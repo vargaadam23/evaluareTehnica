@@ -1,6 +1,7 @@
 package com.adam.evaluaretehnica.quest;
 
 import com.adam.evaluaretehnica.user.User;
+import com.adam.evaluaretehnica.userquest.QuestStatus;
 import com.adam.evaluaretehnica.userquest.UserQuest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -27,6 +28,7 @@ public class Quest {
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private int individualTokenPrize;
+    private int totalTokenPrize;
     @OneToMany(mappedBy = "quest", cascade = CascadeType.ALL)
     private List<UserQuest> assignedUserQuests;
     @JsonIgnore
@@ -37,7 +39,14 @@ public class Quest {
     private int questMasterReward;
     private boolean requiresProof;
 
-    public void addUserQuest(UserQuest userQuest){
+    public void addUserQuest(UserQuest userQuest) {
         assignedUserQuests.add(userQuest);
+    }
+
+    public void calculateIndividualTokenPrize() {
+        if (!assignedUserQuests.isEmpty() && totalTokenPrize > 0) {
+            long count = assignedUserQuests.stream().filter(userQuest -> !userQuest.getQuestStatus().equals(QuestStatus.CANCELLED)).count();
+            setIndividualTokenPrize((int) (totalTokenPrize / count));
+        }
     }
 }

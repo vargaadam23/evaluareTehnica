@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.userquest;
 
+import com.adam.evaluaretehnica.quest.http.UserQuestStatusChangeRequest;
 import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,34 @@ public class UserQuestService {
     @Autowired
     private final UserService userService;
 
-    public void createUserQuestsForQuest(List<UserQuest> userQuestList){
+    public void createUserQuestsForQuest(List<UserQuest> userQuestList) {
         userQuestRepository.saveAll(userQuestList);
     }
 
-    public List<UserQuest> getAllCurrentUserQuests(){
+    public List<UserQuest> getAllCurrentUserQuests() {
         return userQuestRepository.findByUserAndIsFinalised(
                 userService.getCurrentUser(), false
         );
+    }
+
+    public void handleUserQuestStatusChange(UserQuestStatusChangeRequest statusChangeRequest) {
+        UserQuest userQuest = userQuestRepository.findById(statusChangeRequest.getUserQuestId()).orElseThrow();
+
+        User questUser = userQuest.getUser();
+        User questMaster = userQuest.getQuest().getQuestMaster();
+        User currentUser = userService.getCurrentUser();
+
+        //Check if current user is quest master or quest user
+        boolean isCurrentUserQuestMaster = currentUser.equals(questMaster);
+        boolean isCurrentUserQuestUser = currentUser.equals(questUser);
+
+        boolean statusChangeResult = statusChangeRequest
+                .getQuestStatus()
+                .handleStateChange(userQuest, isCurrentUserQuestMaster ,isCurrentUserQuestUser );
+
+        if(statusChangeResult){
+            userQuestRepository.save(userQuest);
+        }
     }
 
 }

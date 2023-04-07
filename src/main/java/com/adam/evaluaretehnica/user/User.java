@@ -1,6 +1,5 @@
 package com.adam.evaluaretehnica.user;
 
-import com.adam.evaluaretehnica.badge.Badge;
 import com.adam.evaluaretehnica.quest.Quest;
 import com.adam.evaluaretehnica.security.token.Token;
 import com.adam.evaluaretehnica.userquest.UserQuest;
@@ -20,11 +19,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(unique = true)
     private String username;
     private String password;
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
@@ -72,5 +72,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void addCurrencyTokensToBalance(int amount) {
+        setCurrencyTokens(getCurrencyTokens() + amount);
     }
 }

@@ -23,6 +23,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public LogInResponse register(RegisterRequest request) {
+        if (repository.existsByUsername(request.getUsername())) {
+            throw new UserAlreadyExistsException("A user with the same username already exists!",
+                    new Exception("Username already exists in database!"));
+        }
+
         var user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
