@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.user;
 
+import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
 import com.adam.evaluaretehnica.quest.Quest;
 import com.adam.evaluaretehnica.security.token.Token;
 import com.adam.evaluaretehnica.userquest.UserQuest;
@@ -20,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User implements UserDetails, RankedEntity {
     @Id
     @GeneratedValue
     private Long id;
@@ -76,5 +77,13 @@ public class User implements UserDetails {
 
     public void addCurrencyTokensToBalance(int amount) {
         setCurrencyTokens(getCurrencyTokens() + amount);
+    }
+
+    public void subtractCurrencyTokensFromBalance(int amount) throws NotEnoughTokensException {
+        if (amount > getCurrencyTokens()){
+            throw new NotEnoughTokensException("User does not have enough tokens to create this quest!");
+        }
+
+        setCurrencyTokens(getCurrencyTokens() - amount);
     }
 }

@@ -1,4 +1,4 @@
-package com.adam.evaluaretehnica;
+package com.adam.evaluaretehnica.util;
 
 import com.adam.evaluaretehnica.user.UserRepository;
 import lombok.RequiredArgsConstructor;

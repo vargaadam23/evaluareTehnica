@@ -1,4 +1,4 @@
-package com.adam.evaluaretehnica.security.authentication;
+package com.adam.evaluaretehnica.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

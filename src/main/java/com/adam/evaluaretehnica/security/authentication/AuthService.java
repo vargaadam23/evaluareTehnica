@@ -1,5 +1,9 @@
 package com.adam.evaluaretehnica.security.authentication;
 
+import com.adam.evaluaretehnica.exception.UserAlreadyExistsException;
+import com.adam.evaluaretehnica.security.authentication.http.LogInRequest;
+import com.adam.evaluaretehnica.security.authentication.http.LogInResponse;
+import com.adam.evaluaretehnica.security.authentication.http.RegisterRequest;
 import com.adam.evaluaretehnica.security.token.JwtService;
 import com.adam.evaluaretehnica.security.token.Token;
 import com.adam.evaluaretehnica.security.token.TokenRepository;

@@ -1,5 +1,8 @@
 package com.adam.evaluaretehnica.security.authentication;
 
+import com.adam.evaluaretehnica.security.authentication.http.LogInRequest;
+import com.adam.evaluaretehnica.security.authentication.http.LogInResponse;
+import com.adam.evaluaretehnica.security.authentication.http.RegisterRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

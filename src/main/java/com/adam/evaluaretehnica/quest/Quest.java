@@ -36,7 +36,7 @@ public class Quest {
     @JoinColumn(name = "qm_id")
     private User questMaster;
     private boolean isFinalised;
-    private int questMasterReward;
+    //TODO
     private boolean requiresProof;
 
     public void addUserQuest(UserQuest userQuest) {

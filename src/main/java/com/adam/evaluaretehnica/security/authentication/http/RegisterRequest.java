@@ -1,4 +1,4 @@
-package com.adam.evaluaretehnica.security.authentication;
+package com.adam.evaluaretehnica.security.authentication.http;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

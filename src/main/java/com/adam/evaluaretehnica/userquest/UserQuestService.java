@@ -28,24 +28,30 @@ public class UserQuestService {
         );
     }
 
-    public void handleUserQuestStatusChange(UserQuestStatusChangeRequest statusChangeRequest) {
+    public boolean handleUserQuestStatusChange(UserQuestStatusChangeRequest statusChangeRequest) {
         UserQuest userQuest = userQuestRepository.findById(statusChangeRequest.getUserQuestId()).orElseThrow();
+
+        if(userQuest.getQuest().isFinalised() || userQuest.isFinalised()){
+            return false;
+        }
 
         User questUser = userQuest.getUser();
         User questMaster = userQuest.getQuest().getQuestMaster();
         User currentUser = userService.getCurrentUser();
 
         //Check if current user is quest master or quest user
-        boolean isCurrentUserQuestMaster = currentUser.equals(questMaster);
-        boolean isCurrentUserQuestUser = currentUser.equals(questUser);
+        boolean isCurrentUserQuestMaster = currentUser.getId().equals(questMaster.getId());
+        boolean isCurrentUserQuestUser = currentUser.getId().equals(questUser.getId());
 
         boolean statusChangeResult = statusChangeRequest
                 .getQuestStatus()
                 .handleStateChange(userQuest, isCurrentUserQuestMaster ,isCurrentUserQuestUser );
-
+        System.out.println("Status changing "+isCurrentUserQuestMaster+isCurrentUserQuestUser+" "+statusChangeRequest.getQuestStatus());
         if(statusChangeResult){
             userQuestRepository.save(userQuest);
         }
+
+        return statusChangeResult;
     }
 
 }

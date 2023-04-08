@@ -1,4 +1,4 @@
-package com.adam.evaluaretehnica.security.authentication;
+package com.adam.evaluaretehnica.security.authentication.http;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

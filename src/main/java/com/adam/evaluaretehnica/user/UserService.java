@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.user;
 
+import com.adam.evaluaretehnica.user.http.RankingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,5 +20,20 @@ public class UserService {
 
     public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public RankingResponse getUserRanks(){
+        return new RankingResponse(userRepository.findRankedEntityByOrderByCurrencyTokensDesc());
+    }
+
+    public void updateUserRanks(){
+        List<User> users = userRepository.findByOrderByCurrencyTokensDesc();
+        int rank = 0;
+        for(User user : users){
+            rank++;
+            user.setRank(rank);
+        }
+
+        userRepository.saveAll(users);
     }
 }

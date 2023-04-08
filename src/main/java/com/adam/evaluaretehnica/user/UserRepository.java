@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.user;
 
+import com.adam.evaluaretehnica.user.http.RankedEntityResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
@@ -12,4 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsername(String username);
 
     List<User> findByIdIn(Collection<Long> userIds);
+
+    List<RankedEntityResponse> findRankedEntityByOrderByCurrencyTokensDesc();
+
+    List<User> findByOrderByCurrencyTokensDesc();
 }

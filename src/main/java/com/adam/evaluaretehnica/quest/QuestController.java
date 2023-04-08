@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.quest;
 
+import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
 import com.adam.evaluaretehnica.quest.http.QuestCreationRequest;
 import com.adam.evaluaretehnica.quest.http.QuestMasterQuestsResponse;
 import com.adam.evaluaretehnica.quest.http.UserQuestResponse;
@@ -31,8 +32,11 @@ public class QuestController {
 
     @PostMapping("/user-quests/status-change")
     public ResponseEntity<String> changeUserQuestStatus(@RequestBody @Valid UserQuestStatusChangeRequest userQuestStatusChangeRequest) {
-        userQuestService.handleUserQuestStatusChange(userQuestStatusChangeRequest);
-        return new ResponseEntity<>("Updated quest status", HttpStatus.OK);
+        boolean result = userQuestService.handleUserQuestStatusChange(userQuestStatusChangeRequest);
+        if(result){
+            return new ResponseEntity<>("Updated quest status", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Status update unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
 //    TODO
@@ -48,7 +52,7 @@ public class QuestController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createNewQuest(@RequestBody @Valid QuestCreationRequest creationRequest) {
+    public ResponseEntity<String> createNewQuest(@RequestBody @Valid QuestCreationRequest creationRequest) throws NotEnoughTokensException {
         questService.createQuestWithCreationRequest(creationRequest);
         return new ResponseEntity<>("Created new quest", HttpStatus.CREATED);
     }

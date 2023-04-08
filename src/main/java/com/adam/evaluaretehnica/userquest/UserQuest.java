@@ -29,8 +29,10 @@ public class UserQuest {
     private boolean isFinalised;
     @Enumerated
     private QuestStatus questStatus;
+    //TODO
     private String pathToProof;
 
+    //TODO
     public boolean getRequiresProof(){
         return quest.isRequiresProof();
     }

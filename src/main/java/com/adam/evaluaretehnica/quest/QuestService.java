@@ -1,18 +1,22 @@
 package com.adam.evaluaretehnica.quest;
 
+import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
 import com.adam.evaluaretehnica.quest.http.QuestCreationRequest;
 import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.user.UserService;
 import com.adam.evaluaretehnica.userquest.QuestStatus;
 import com.adam.evaluaretehnica.userquest.UserQuest;
-import com.adam.evaluaretehnica.userquest.UserQuestService;
+import com.adam.evaluaretehnica.util.QuestExpireTask;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -25,10 +29,10 @@ public class QuestService {
     private final UserService userService;
 
     @Autowired
-    private final UserQuestService userQuestService;
+    private final TaskScheduler taskScheduler;
 
     @Transactional
-    public void createQuestWithCreationRequest(QuestCreationRequest request) {
+    public void createQuestWithCreationRequest(QuestCreationRequest request) throws NotEnoughTokensException {
         //Create quest with already known properties
         Quest quest = Quest.builder()
                 .name(request.getName())
@@ -37,7 +41,6 @@ public class QuestService {
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.parse(request.getExpiresAt()))
                 .isFinalised(false)
-                .questMasterReward(0)
                 .assignedUserQuests(new ArrayList<>())
                 .requiresProof(request.isRequiresProof())
                 .totalTokenPrize(request.getPrize())
@@ -48,6 +51,9 @@ public class QuestService {
         //Get users from request and current user
         List<User> userList = userService.getUsersBasedOnIdList(request.getUsers());
         User currentUser = userService.getCurrentUser();
+
+        //Subtract the prize amount from the quest master's balance
+        currentUser.subtractCurrencyTokensFromBalance(request.getPrize());
 
         //Remove quest master from list if present
         userList.remove(currentUser);
@@ -70,6 +76,14 @@ public class QuestService {
         quest.calculateIndividualTokenPrize();
 
         questRepository.save(quest);
+
+        //Schedule the expiration date task
+        taskScheduler.schedule(
+                new QuestExpireTask(quest, questRepository),
+                Date.from(quest.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant())
+        );
+
+        System.out.println(Date.from(quest.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant()).toString());
     }
 
     public List<Quest> getQuestMasterQuests() {
