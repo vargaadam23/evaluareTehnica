@@ -6,7 +6,7 @@ import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.user.UserService;
 import com.adam.evaluaretehnica.userquest.QuestStatus;
 import com.adam.evaluaretehnica.userquest.UserQuest;
-import com.adam.evaluaretehnica.util.QuestExpireTask;
+import com.adam.evaluaretehnica.util.scheduling.QuestExpireTask;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

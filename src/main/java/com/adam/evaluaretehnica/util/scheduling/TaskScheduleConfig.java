@@ -1,4 +1,4 @@
-package com.adam.evaluaretehnica.util;
+package com.adam.evaluaretehnica.util.scheduling;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

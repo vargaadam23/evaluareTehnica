@@ -1,4 +1,4 @@
-package com.adam.evaluaretehnica.util;
+package com.adam.evaluaretehnica.util.scheduling;
 
 import com.adam.evaluaretehnica.quest.Quest;
 import com.adam.evaluaretehnica.quest.QuestRepository;

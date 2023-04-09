@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.user;
 
+import com.adam.evaluaretehnica.badge.Badge;
 import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
 import com.adam.evaluaretehnica.quest.Quest;
 import com.adam.evaluaretehnica.security.token.Token;
@@ -37,8 +38,15 @@ public class User implements UserDetails, RankedEntity {
     @OneToMany(mappedBy = "user")
     private List<UserQuest> userQuests;
     private int currencyTokens;
-//    @OneToMany(mappedBy = "user")
-//    private List<Badge> badges;
+    @ManyToMany(
+            cascade = CascadeType.ALL
+    )
+    @JoinTable(
+            name = "user_badges",
+            joinColumns = @JoinColumn(name = "user_id") ,
+            inverseJoinColumns = @JoinColumn(name = "badge_id")
+    )
+    private List<Badge> badges;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -73,6 +81,11 @@ public class User implements UserDetails, RankedEntity {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public void setCurrencyTokens(int amount){
+        currencyTokens = amount;
     }
 
     public void addCurrencyTokensToBalance(int amount) {
