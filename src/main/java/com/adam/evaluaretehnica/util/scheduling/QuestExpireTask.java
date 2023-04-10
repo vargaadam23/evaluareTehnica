@@ -29,7 +29,13 @@ public class QuestExpireTask implements Runnable {
             }
 
             if (!userQuest.isFinalised()) {
-                QuestStatus.FAILED.handleStateChange(userQuest, true, false);
+                try{
+                    QuestStatus.IN_REVIEW.handleStateChange(userQuest, false, true);
+                    QuestStatus.FAILED.handleStateChange(userQuest, true, false);
+                }catch (Exception e){
+                    //asd
+                }
+
             }
         }
 

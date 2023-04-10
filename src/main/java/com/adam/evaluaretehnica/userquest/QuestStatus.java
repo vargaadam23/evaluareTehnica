@@ -1,65 +1,78 @@
 package com.adam.evaluaretehnica.userquest;
 
+import com.adam.evaluaretehnica.exception.UnauthorizedStatusChangeException;
+
 public enum QuestStatus {
     CANCELLED {
         @Override
-        public boolean handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
+        public void handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
             //Only quest users can change the status to cancelled
             if(!isQuestUser){
-                return false;
+                throw new UnauthorizedStatusChangeException(
+                        "Status change unauthorized! Only the quests user can change  it's status");
             }
             userQuest.setQuestStatus(CANCELLED);
             userQuest.setFinalised(true);
             userQuest.getQuest().calculateIndividualTokenPrize();
-            return true;
         }
     },
     IN_REVIEW {
         @Override
-        public boolean handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
+        public void handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
             //Only quest users can change the status to in_review
             if(!isQuestUser){
-                return false;
+                throw new UnauthorizedStatusChangeException(
+                        "Status change unauthorized! Only the quests user can change  it's status");
             }
 
             userQuest.setQuestStatus(IN_REVIEW);
-            return true;
         }
     },
     FAILED {
         @Override
-        public boolean handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
+        public void handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
             //Only quest masters can change the status to failed
             if(!isQuestMaster){
-                return false;
+                throw new UnauthorizedStatusChangeException(
+                        "Status change unauthorized! Only the quest master can change  it's status");
+            }
+
+            if(!userQuest.getQuestStatus().equals(IN_REVIEW)){
+                throw new UnauthorizedStatusChangeException(
+                        "Status change unauthorized! Quest has to be in review before it can be finalised");
             }
             userQuest.setQuestStatus(FAILED);
             userQuest.setFinalised(true);
-            return true;
         }
     },
     COMPLETED {
         @Override
-        public boolean handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
+        public void handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
             //Only quest masters can change the status to completed
             if(!isQuestMaster){
-                return false;
+                throw new UnauthorizedStatusChangeException(
+                        "Status change unauthorized! Only the quest master can change  it's status");
+            }
+
+            if(!userQuest.getQuestStatus().equals(IN_REVIEW)){
+                throw new UnauthorizedStatusChangeException(
+                        "Status change unauthorized! Quest has to be in review before it can be finalised");
             }
             userQuest.setQuestStatus(COMPLETED);
             //Add individual token prize to the balance of the user
             userQuest.getUser().addCurrencyTokensToBalance(
                     userQuest.getQuest().getIndividualTokenPrize());
             userQuest.setFinalised(true);
-            return true;
         }
     },
     NEW {
         @Override
-        public boolean handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
-            //No one can change the status back to null
-            return false;
+        public void handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) {
+            //No one can change the status back to new
+            throw new UnauthorizedStatusChangeException(
+                    "Status change unauthorized! Please authenticate as a user that has status change privileges!");
         }
     };
 
-    public abstract boolean handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser);
+    public abstract void handleStateChange(UserQuest userQuest, boolean isQuestMaster, boolean isQuestUser) throws UnauthorizedStatusChangeException;
 }

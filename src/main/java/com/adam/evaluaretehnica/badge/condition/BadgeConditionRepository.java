@@ -5,5 +5,5 @@ import com.adam.evaluaretehnica.badge.Badge;
 import java.util.List;
 
 public interface BadgeConditionRepository {
-    List<Badge> findByBadgeConditions();
+    <T> List<Badge> findByBadgeConditions(String condition, ConditionArgument<T> conditionArgument);
 }

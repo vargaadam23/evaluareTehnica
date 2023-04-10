@@ -1,6 +1,9 @@
 package com.adam.evaluaretehnica.quest;
 
 import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
+import com.adam.evaluaretehnica.exception.UnauthorizedStatusChangeException;
+import com.adam.evaluaretehnica.http.ETResponse;
+import com.adam.evaluaretehnica.http.GenericResponse;
 import com.adam.evaluaretehnica.quest.http.QuestCreationRequest;
 import com.adam.evaluaretehnica.quest.http.QuestMasterQuestsResponse;
 import com.adam.evaluaretehnica.quest.http.UserQuestResponse;
@@ -25,35 +28,52 @@ public class QuestController {
     private final UserQuestService userQuestService;
 
     @GetMapping("/user-quests")
-    public ResponseEntity<UserQuestResponse> getAllQuestsForUser() {
+    public ResponseEntity<ETResponse> getAllQuestsForUser() {
         UserQuestResponse userQuestResponse = new UserQuestResponse(userQuestService.getAllCurrentUserQuests());
-        return ResponseEntity.ok(userQuestResponse);
+        return ResponseEntity.ok(
+                new ETResponse(
+                        HttpStatus.OK,
+                        "/quests/user-quests",
+                        userQuestResponse)
+        );
     }
 
     @PostMapping("/user-quests/status-change")
-    public ResponseEntity<String> changeUserQuestStatus(@RequestBody @Valid UserQuestStatusChangeRequest userQuestStatusChangeRequest) {
-        boolean result = userQuestService.handleUserQuestStatusChange(userQuestStatusChangeRequest);
-        if(result){
-            return new ResponseEntity<>("Updated quest status", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Status update unauthorized", HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ETResponse> changeUserQuestStatus(@RequestBody @Valid UserQuestStatusChangeRequest userQuestStatusChangeRequest) {
+        userQuestService.handleUserQuestStatusChange(userQuestStatusChangeRequest);
+        return ResponseEntity.ok(
+                new ETResponse(
+                        HttpStatus.OK,
+                        "/quests/user-quests/status-change",
+                        new GenericResponse(
+                                "Quest status successfully updated"
+                        ))
+        );
     }
 
-//    TODO
-//    @PostMapping("/user-quests/upload-proof")
-//    public void uploadProofOfQuest(@RequestBody @Valid Quest quest) {
-//        //upload a file
-//    }
-
     @GetMapping
-    public ResponseEntity<QuestMasterQuestsResponse> getQuestMasterQuests() {
+    public ResponseEntity<ETResponse> getQuestMasterQuests() {
         QuestMasterQuestsResponse questMasterQuestsResponse = new QuestMasterQuestsResponse(questService.getQuestMasterQuests());
-        return ResponseEntity.ok(questMasterQuestsResponse);
+        return ResponseEntity.ok(
+                new ETResponse(
+                        HttpStatus.OK,
+                        "/quests",
+                        questMasterQuestsResponse)
+        );
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createNewQuest(@RequestBody @Valid QuestCreationRequest creationRequest) throws NotEnoughTokensException {
+    public ResponseEntity<ETResponse> createNewQuest(@RequestBody @Valid QuestCreationRequest creationRequest) throws NotEnoughTokensException {
         questService.createQuestWithCreationRequest(creationRequest);
-        return new ResponseEntity<>("Created new quest", HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                new ETResponse(
+                        HttpStatus.OK,
+                        "/quests/create",
+                        new GenericResponse(
+                                "Successfully created new quest"
+                        )
+                ),
+                HttpStatus.CREATED
+        );
     }
 }

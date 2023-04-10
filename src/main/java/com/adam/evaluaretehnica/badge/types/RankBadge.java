@@ -13,7 +13,4 @@ import lombok.NoArgsConstructor;
 public class RankBadge extends Badge {
     private int requiredRank;
     private String addedCondition;
-    public static final String condition="rank>=?";
-
-
 }

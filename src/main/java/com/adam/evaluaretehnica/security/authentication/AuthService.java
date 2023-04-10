@@ -26,15 +26,14 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public LogInResponse register(RegisterRequest request) {
-        if (repository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException("A user with the same username already exists!",
-                    new Exception("Username already exists in database!"));
+    public LogInResponse register(RegisterRequest request) throws UserAlreadyExistsException {
+        if (repository.existsByUsername(request.username())) {
+            throw new UserAlreadyExistsException("A user with the same username already exists!");
         }
 
         var user = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .username(request.username())
+                .password(passwordEncoder.encode(request.password()))
                 .currencyTokens(200)
                 .ownedQuests(new ArrayList<>())
                 .userQuests(new ArrayList<>())
@@ -45,26 +44,22 @@ public class AuthService {
 
         var jwtToken = jwtService.generateToken(user);
         saveUserToken(savedUser, jwtToken);
-        return LogInResponse.builder()
-                .token(jwtToken)
-                .build();
+        return new LogInResponse(jwtToken);
     }
 
     public LogInResponse authenticate(LogInRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
-        var user = repository.findByUsername(request.getUsername())
+        var user = repository.findByUsername(request.username())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
-        return LogInResponse.builder()
-                .token(jwtToken)
-                .build();
+        return new LogInResponse(jwtToken);
     }
 
     private void saveUserToken(User user, String jwtToken) {

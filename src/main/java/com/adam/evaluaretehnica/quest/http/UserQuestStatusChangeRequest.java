@@ -7,13 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserQuestStatusChangeRequest {
-    @NotNull
-    @Min(value = 1)
-    private Long userQuestId;
-    @NotNull
-    private QuestStatus questStatus;
-}
+public record UserQuestStatusChangeRequest(
+        @NotNull
+        @Min(value = 1)
+        Long userQuestId,
+        @NotNull
+        QuestStatus questStatus){}

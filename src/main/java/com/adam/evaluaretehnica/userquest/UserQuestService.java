@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.userquest;
 
+import com.adam.evaluaretehnica.exception.UnauthorizedStatusChangeException;
 import com.adam.evaluaretehnica.quest.http.UserQuestStatusChangeRequest;
 import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.user.UserService;
@@ -28,11 +29,12 @@ public class UserQuestService {
         );
     }
 
-    public boolean handleUserQuestStatusChange(UserQuestStatusChangeRequest statusChangeRequest) {
-        UserQuest userQuest = userQuestRepository.findById(statusChangeRequest.getUserQuestId()).orElseThrow();
+    public void handleUserQuestStatusChange(UserQuestStatusChangeRequest statusChangeRequest) throws UnauthorizedStatusChangeException{
+        UserQuest userQuest = userQuestRepository.findById(statusChangeRequest.userQuestId()).orElseThrow();
 
         if(userQuest.getQuest().isFinalised() || userQuest.isFinalised()){
-            return false;
+            throw new UnauthorizedStatusChangeException(
+                    "Status change unauthorized! Quest is already finalised");
         }
 
         User questUser = userQuest.getUser();
@@ -43,15 +45,12 @@ public class UserQuestService {
         boolean isCurrentUserQuestMaster = currentUser.getId().equals(questMaster.getId());
         boolean isCurrentUserQuestUser = currentUser.getId().equals(questUser.getId());
 
-        boolean statusChangeResult = statusChangeRequest
-                .getQuestStatus()
+       statusChangeRequest
+                .questStatus()
                 .handleStateChange(userQuest, isCurrentUserQuestMaster ,isCurrentUserQuestUser );
-        System.out.println("Status changing "+isCurrentUserQuestMaster+isCurrentUserQuestUser+" "+statusChangeRequest.getQuestStatus());
-        if(statusChangeResult){
-            userQuestRepository.save(userQuest);
-        }
+        System.out.println("Status changing "+isCurrentUserQuestMaster+isCurrentUserQuestUser+" "+ statusChangeRequest.questStatus());
 
-        return statusChangeResult;
+        userQuestRepository.save(userQuest);
     }
 
 }

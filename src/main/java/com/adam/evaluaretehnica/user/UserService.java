@@ -15,6 +15,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     public List<User> getUsersBasedOnIdList(List<Long> userIds) {
+        //exclude current user
         return userRepository.findByIdIn(userIds);
     }
 

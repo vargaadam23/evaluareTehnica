@@ -35,28 +35,28 @@ public class QuestService {
     public void createQuestWithCreationRequest(QuestCreationRequest request) throws NotEnoughTokensException {
         //Create quest with already known properties
         Quest quest = Quest.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .shortDescription(request.getShortDescription())
+                .name(request.name())
+                .description(request.description())
+                .shortDescription(request.shortDescription())
                 .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.parse(request.getExpiresAt()))
+                .expiresAt(LocalDateTime.parse(request.expiresAt()))
                 .isFinalised(false)
                 .assignedUserQuests(new ArrayList<>())
-                .requiresProof(request.isRequiresProof())
-                .totalTokenPrize(request.getPrize())
+                .requiresProof(request.requiresProof())
+                .totalTokenPrize(request.prize())
                 .build();
 
         UserQuest userQuest = null;
 
         //Get users from request and current user
-        List<User> userList = userService.getUsersBasedOnIdList(request.getUsers());
         User currentUser = userService.getCurrentUser();
-
-        //Subtract the prize amount from the quest master's balance
-        currentUser.subtractCurrencyTokensFromBalance(request.getPrize());
+        List<User> userList = userService.getUsersBasedOnIdList(request.users());
 
         //Remove quest master from list if present
-        userList.remove(currentUser);
+
+
+        //Subtract the prize amount from the quest master's balance
+        currentUser.subtractCurrencyTokensFromBalance(request.prize());
 
         quest.setQuestMaster(currentUser);
 

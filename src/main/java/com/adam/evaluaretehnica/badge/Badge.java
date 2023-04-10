@@ -23,6 +23,4 @@ public abstract class Badge {
     private int importance;
     private String conditionDescription;
     public static final String condition = "";
-
-    public abstract String getAddedCondition();
 }

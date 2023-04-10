@@ -1,5 +1,6 @@
 package com.adam.evaluaretehnica.security;
 
+import com.adam.evaluaretehnica.security.authentication.AuthEntryPoint;
 import com.adam.evaluaretehnica.security.token.JwtAuthenticationFilter;
 import com.adam.evaluaretehnica.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final LogoutHandler logoutHandler;
+    private final AuthEntryPoint authEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -49,6 +51,9 @@ public class SecurityConfig {
                 .logoutUrl("/auth/logout")
                 .addLogoutHandler(logoutHandler)
                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authEntryPoint)
         ;
 
         return http.build();

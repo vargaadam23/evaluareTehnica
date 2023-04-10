@@ -13,6 +13,5 @@ import lombok.NoArgsConstructor;
 public class CurrencyTokenBadge extends Badge {
     private int requiredTokenAmount;
     private int addedCondition;
-    public static final String condition="currency_tokens>=?";
 
 }
