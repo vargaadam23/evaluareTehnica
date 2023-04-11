@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -55,7 +56,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+            UserDetails userDetails = null;
+            try {
+                userDetails = this.userDetailsService.loadUserByUsername(userName);
+            }catch (RuntimeException e){
+                sendUserNotFoundResponse(request,response, e);
+                return;
+            }
+
 
             var isTokenValid = tokenRepository.findByToken(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
@@ -80,6 +88,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     //Filter exceptions are not handled by @ControllerAdvice handlers
     private void sendJwtErrorAuthResponse(HttpServletRequest request, HttpServletResponse response, RuntimeException e) throws IOException {
         ResponseEntity<ETResponse> responseEntity = applicationExceptionHandler.handleJwtExpired((ExpiredJwtException) e,  request);
+        PrintWriter pr = response.getWriter();
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        pr.print(objectMapper.writeValueAsString(responseEntity.getBody()));
+        pr.flush();
+        pr.close();
+    }
+
+    private void sendUserNotFoundResponse(HttpServletRequest request, HttpServletResponse response, RuntimeException e) throws IOException {
+        ResponseEntity<ETResponse> responseEntity = applicationExceptionHandler.handleAuthenticationException((AuthenticationException) e,request);
         PrintWriter pr = response.getWriter();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         pr.print(objectMapper.writeValueAsString(responseEntity.getBody()));

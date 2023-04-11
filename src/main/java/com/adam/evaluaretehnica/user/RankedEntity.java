@@ -1,5 +1,9 @@
 package com.adam.evaluaretehnica.user;
 
+import com.adam.evaluaretehnica.badge.Badge;
+
+import java.util.List;
+
 public interface RankedEntity {
     String getUsername();
 

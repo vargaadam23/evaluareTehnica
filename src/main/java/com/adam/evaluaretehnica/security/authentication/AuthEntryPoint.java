@@ -16,6 +16,7 @@ import java.io.IOException;
 public class AuthEntryPoint implements AuthenticationEntryPoint {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
+    //Used to manually handle authentication related exceptions
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         handlerExceptionResolver.resolveException(request, response, null, authException);

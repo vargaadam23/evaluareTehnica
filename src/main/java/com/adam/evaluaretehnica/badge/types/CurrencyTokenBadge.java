@@ -1,17 +1,32 @@
 package com.adam.evaluaretehnica.badge.types;
 
 import com.adam.evaluaretehnica.badge.Badge;
+import com.adam.evaluaretehnica.user.User;
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class CurrencyTokenBadge extends Badge {
     private int requiredTokenAmount;
-    private int addedCondition;
 
+    @Override
+    public BadgeType getBadgeType() {
+        return BadgeType.CURRENCY_TOKEN;
+    }
+
+    @Override
+    public Badge setValue(String value) {
+        requiredTokenAmount = Integer.parseInt(value);
+        return this;
+    }
+
+    @Override
+    public boolean isEligibleForUser(User user) {
+        return user.getCurrencyTokens() >= requiredTokenAmount;
+    }
 }

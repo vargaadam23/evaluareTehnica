@@ -1,11 +1,13 @@
 package com.adam.evaluaretehnica.user.http;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
-public class UserResponse implements RankedEntityResponse{
+public class UserResponse implements RankedEntityResponse {
     private String username;
     private int currencyTokens;
     private int rank;

@@ -2,6 +2,7 @@ package com.adam.evaluaretehnica.userquest;
 
 import com.adam.evaluaretehnica.exception.UnauthorizedStatusChangeException;
 
+//Used to handle status changes
 public enum QuestStatus {
     CANCELLED {
         @Override

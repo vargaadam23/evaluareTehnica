@@ -1,9 +1,6 @@
 package com.adam.evaluaretehnica.quest.http;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,8 +16,7 @@ public record QuestCreationRequest (
         String description,
         String shortDescription,
         @NotEmpty
-//    TODO
-//    @Pattern(regexp = "^d{4}-\\d{2}-\\d{2}[Tt]\\d{2}:\\d{2}:\\d{2}$", message = "Date must be of format YYYY-MM-DDThh:mm")
+        @NotNull
         String expiresAt,
         @NotEmpty
         List<Long> users,

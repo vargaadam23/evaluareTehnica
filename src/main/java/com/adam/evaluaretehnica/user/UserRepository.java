@@ -1,6 +1,7 @@
 package com.adam.evaluaretehnica.user;
 
 import com.adam.evaluaretehnica.user.http.RankedEntityResponse;
+import com.adam.evaluaretehnica.user.http.UserResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

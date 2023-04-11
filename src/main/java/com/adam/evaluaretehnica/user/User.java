@@ -6,17 +6,16 @@ import com.adam.evaluaretehnica.quest.Quest;
 import com.adam.evaluaretehnica.security.token.Token;
 import com.adam.evaluaretehnica.userquest.UserQuest;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
-@Data
+
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,7 +38,8 @@ public class User implements UserDetails, RankedEntity {
     private List<UserQuest> userQuests;
     private int currencyTokens;
     @ManyToMany(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.EAGER
     )
     @JoinTable(
             name = "user_badges",
@@ -88,15 +88,24 @@ public class User implements UserDetails, RankedEntity {
         currencyTokens = amount;
     }
 
+    public void addBadge(Badge badge){
+       badges.add(badge);
+    }
+
+    public void addBadgeWithCheck(Badge badge){
+        if(badges.stream().filter(badgePredicate-> badge.getId().equals(badgePredicate.getId())).toList().isEmpty()){
+            badges.add(badge);
+        }
+    }
+
     public void addCurrencyTokensToBalance(int amount) {
         setCurrencyTokens(getCurrencyTokens() + amount);
     }
 
-    public void subtractCurrencyTokensFromBalance(int amount) throws NotEnoughTokensException {
+    public void subtractCurrencyTokensFromBalance( int amount) throws NotEnoughTokensException {
         if (amount > getCurrencyTokens()){
-            throw new NotEnoughTokensException("User does not have enough tokens to create this quest!");
+            throw new NotEnoughTokensException("User does not have enough tokens to finalise this operation!");
         }
-
         setCurrencyTokens(getCurrencyTokens() - amount);
     }
 }

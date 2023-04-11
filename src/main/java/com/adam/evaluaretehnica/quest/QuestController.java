@@ -1,7 +1,7 @@
 package com.adam.evaluaretehnica.quest;
 
 import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
-import com.adam.evaluaretehnica.exception.UnauthorizedStatusChangeException;
+import com.adam.evaluaretehnica.exception.QuestCreationException;
 import com.adam.evaluaretehnica.http.ETResponse;
 import com.adam.evaluaretehnica.http.GenericResponse;
 import com.adam.evaluaretehnica.quest.http.QuestCreationRequest;
@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/quests")
 public class QuestController {
 
-    @Autowired
     private final QuestService questService;
-
-    @Autowired
     private final UserQuestService userQuestService;
 
     @GetMapping("/user-quests")
@@ -63,7 +60,7 @@ public class QuestController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ETResponse> createNewQuest(@RequestBody @Valid QuestCreationRequest creationRequest) throws NotEnoughTokensException {
+    public ResponseEntity<ETResponse> createNewQuest(@RequestBody @Valid QuestCreationRequest creationRequest) throws NotEnoughTokensException, QuestCreationException {
         questService.createQuestWithCreationRequest(creationRequest);
         return new ResponseEntity<>(
                 new ETResponse(

@@ -1,5 +1,8 @@
 package com.adam.evaluaretehnica.user;
 
+import com.adam.evaluaretehnica.badge.http.BadgeListResponse;
+import com.adam.evaluaretehnica.badge.http.BadgeResponse;
+import com.adam.evaluaretehnica.badge.http.UserBadgeResponse;
 import com.adam.evaluaretehnica.http.ETResponse;
 import com.adam.evaluaretehnica.user.http.RankingResponse;
 import com.adam.evaluaretehnica.user.http.UserResponse;
@@ -17,8 +20,6 @@ import java.util.List;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-
-    @Autowired
     private final UserService userService;
 
     @GetMapping("/current-user")
@@ -33,6 +34,17 @@ public class UserController {
                                 currentUser.getCurrencyTokens(),
                                 currentUser.getRank()
                         )
+                )
+        );
+    }
+
+    @GetMapping("/current-user/badges")
+    public ResponseEntity<ETResponse> getCurrentUserBadges(){
+        return ResponseEntity.ok(
+                new ETResponse(
+                        HttpStatus.OK,
+                        "/users/current-user/badges",
+                        new UserBadgeResponse(userService.getUserBadges())
                 )
         );
     }

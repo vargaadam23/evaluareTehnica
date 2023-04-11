@@ -1,5 +1,7 @@
 package com.adam.evaluaretehnica.badge;
 
+import com.adam.evaluaretehnica.badge.types.BadgeType;
+import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.util.HashMapConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,5 +24,10 @@ public abstract class Badge {
     private Map<String, String> cssStyles;
     private int importance;
     private String conditionDescription;
-    public static final String condition = "";
+
+    public abstract BadgeType getBadgeType();
+
+    public abstract Badge setValue(String value);
+
+    public abstract boolean isEligibleForUser(User user);
 }
