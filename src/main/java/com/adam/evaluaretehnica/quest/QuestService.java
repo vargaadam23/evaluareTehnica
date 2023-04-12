@@ -9,6 +9,7 @@ import com.adam.evaluaretehnica.user.UserRepository;
 import com.adam.evaluaretehnica.user.UserService;
 import com.adam.evaluaretehnica.userquest.QuestStatus;
 import com.adam.evaluaretehnica.userquest.UserQuest;
+import com.adam.evaluaretehnica.util.ApplicationProperties;
 import com.adam.evaluaretehnica.util.scheduling.QuestExpireTask;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,15 +31,11 @@ public class QuestService {
     private final QuestRepository questRepository;
     private final BadgeService badgeService;
     private final Logger logger = LoggerFactory.getLogger(QuestService.class);
-    private final UserRepository userRepository;
     private final UserService userService;
     private final TaskScheduler taskScheduler;
-    @Value("${adam.evaluareTehnica.maxExpirationDuration:2}")
-    private final String maxExpirationDuration;
-    @Value("${adam.evaluareTehnica.questMasterReward:200}")
-    private final String questMasterReward;
+    private final ApplicationProperties applicationProperties;
 
-    public void createQuestWithCreationRequest(QuestCreationRequest request) throws NotEnoughTokensException, QuestCreationException {
+    public Quest createQuestWithCreationRequest(QuestCreationRequest request) throws NotEnoughTokensException, QuestCreationException {
         //Get users from request and current user
         User currentUser = userService.getCurrentUser();
         if(request.users().contains(currentUser.getId())){
@@ -47,7 +44,8 @@ public class QuestService {
 
         LocalDateTime expiresAt = LocalDateTime.parse(request.expiresAt());
 
-        if(Duration.between(LocalDateTime.now(),expiresAt).toMinutes() < Integer.parseInt(maxExpirationDuration)){
+        if(Duration.between(LocalDateTime.now(),expiresAt).toMinutes() < Integer.parseInt(
+                applicationProperties.getConfigValue("maxExpirationDuration"))){
             throw new QuestCreationException("Quest expiration needs to be further than 2 minutes!");
         }
 
@@ -100,9 +98,12 @@ public class QuestService {
 
         //Schedule the expiration date task
         taskScheduler.schedule(
-                new QuestExpireTask(quest, questRepository,badgeService,questMasterReward),
+                new QuestExpireTask(quest, questRepository,badgeService,
+                        applicationProperties.getConfigValue("questMasterReward")),
                 Date.from(quest.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant())
         );
+
+        return quest;
     }
 
     public List<Quest> getQuestMasterQuests() {

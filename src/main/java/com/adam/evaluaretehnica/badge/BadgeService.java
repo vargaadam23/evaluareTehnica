@@ -5,6 +5,7 @@ import com.adam.evaluaretehnica.exception.NotEnoughTokensException;
 import com.adam.evaluaretehnica.user.User;
 import com.adam.evaluaretehnica.user.UserRepository;
 import com.adam.evaluaretehnica.user.UserService;
+import com.adam.evaluaretehnica.util.ApplicationProperties;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,20 +19,22 @@ public class BadgeService {
     private final BadgeRepository badgeRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-
-    @Value("${adam.evaluareTehnica.badgeCreationCost:200}")
-    private final String badgeCreationCost;
+    private final ApplicationProperties applicationProperties;
 
     public List<Badge> getAllBadges(){
         return badgeRepository.findAll();
     }
 
     @Transactional
-    public void createBadge(BadgeCreationRequest badgeCreationRequest) throws NotEnoughTokensException {
+    public Badge createBadge(BadgeCreationRequest badgeCreationRequest) throws NotEnoughTokensException {
         User currentUser = userService.getCurrentUser();
 
         //Badge creation will cost tokens for the user
-        currentUser.subtractCurrencyTokensFromBalance(Integer.parseInt(badgeCreationCost));
+        currentUser.subtractCurrencyTokensFromBalance(
+                Integer.parseInt(
+                        applicationProperties.getConfigValue("badgeCreationCost")
+                )
+        );
 
         //Create badge instance
         Badge badge = badgeCreationRequest.badgeType().createBadge();
@@ -48,10 +51,12 @@ public class BadgeService {
         badgeRepository.save(badge);
         userRepository.saveAll(userList);
 
+        return badge;
+
     }
 
     //Helper for badge creation, checks if users fulfill badge conditions
-    private List<User> addBadgeToEligibleUsers(Badge badge){
+    public List<User> addBadgeToEligibleUsers(Badge badge){
         List<User> userList = userRepository.findAll();
         for(User user : userList){
             if(badge.isEligibleForUser(user)){

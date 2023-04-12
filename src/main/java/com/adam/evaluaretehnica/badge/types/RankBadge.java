@@ -27,6 +27,6 @@ public class RankBadge extends Badge {
 
     @Override
     public boolean isEligibleForUser(User user) {
-        return user.getRank() >= requiredRank;
+        return user.getRank() <= requiredRank;
     }
 }
